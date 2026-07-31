@@ -443,7 +443,11 @@ function scrollActiveIntoView(){
   const scrollContainer = document.querySelector('.player-scroll');
   const row = document.querySelector('.sub-row.active');
   if(!scrollContainer || !row) return;
-  const targetTop = row.offsetTop - (scrollContainer.clientHeight / 2) + (row.clientHeight / 2);
+  // 讓目前這句貼齊清單最上方（留一點邊距），
+  // 不用「置中」的算法，因為每句字幕行數不同、高度不一樣，
+  // 置中反而容易算出過大的捲動距離，導致目前這句被捲到看不見。
+  const topPadding = 8;
+  const targetTop = row.offsetTop - topPadding;
   scrollContainer.scrollTo({top: targetTop, behavior:'smooth'});
 }
 
