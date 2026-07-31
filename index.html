@@ -157,6 +157,104 @@
   .sline.active{background:#fbefe6; border-left-color:var(--tomato);}
   .sline .ko{font-family:'Noto Sans KR',sans-serif; font-size:16px; font-weight:600; color:var(--ink); margin-bottom:5px;}
   .sline .zh{font-size:13px; color:var(--ink-soft);}
+
+  /* ===== 漢堡選單(平板/手機用) ===== */
+  .menu-toggle{display:none; background:none; border:none; cursor:pointer; padding:6px; flex-direction:column; gap:4px;}
+  .menu-toggle span{width:22px; height:2.5px; background:var(--ink); border-radius:2px;}
+  nav.mobile-open{
+    display:flex; position:fixed; top:0; right:0; bottom:0; width:230px;
+    background:#fff; flex-direction:column; gap:0; padding:70px 24px 24px;
+    box-shadow:-8px 0 30px rgba(0,0,0,0.15); z-index:200;
+  }
+  nav.mobile-open a{padding:14px 0; border-bottom:1px solid #f0e5d2; font-size:15px;}
+  .nav-overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:150;}
+  .nav-overlay.show{display:block;}
+
+  /* ============================================================
+     響應式設計：平板 (max-width: 900px)
+     ============================================================ */
+  @media (max-width:900px){
+    header{padding:12px 20px;}
+    nav{display:none;}
+    .menu-toggle{display:flex;}
+    .signup-btn{padding:8px 16px; font-size:12.5px;}
+
+    .hero{padding:40px 20px 56px;}
+    .hero h1{font-size:28px;}
+    .hero p{font-size:14px;}
+    .hero-stats{gap:10px;}
+    .hero-stat{padding:11px 16px; min-width:90px;}
+    .hero-stat .num{font-size:19px;}
+
+    main{padding:0 20px 50px;}
+    .filter-bar{padding:14px 16px; margin-bottom:24px;}
+    .fchip{font-size:12px; padding:7px 13px;}
+    .sort-select{width:100%; margin-top:4px;}
+
+    .video-grid{grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:14px;}
+
+    .player-topbar{padding:12px 20px;}
+    .player-main{padding:20px 20px 50px; gap:20px;}
+    .video-info h1{font-size:18px;}
+    .subtitle-panel{max-height:400px;}
+  }
+
+  /* ============================================================
+     響應式設計：手機 (max-width: 600px)
+     ============================================================ */
+  @media (max-width:600px){
+    .logo span{font-size:17px;}
+    .logo svg{width:26px; height:26px;}
+
+    .hero{padding:34px 16px 46px;}
+    .hero-eyebrow{font-size:11px;}
+    .hero h1{font-size:23px; line-height:1.35;}
+    .hero p{font-size:13px; line-height:1.6;}
+    .hero-stats{flex-wrap:wrap;}
+    .hero-stat{flex:1; min-width:88px; padding:10px 12px;}
+    .hero-stat .num{font-size:17px;}
+    .hero-stat .txt{font-size:10px;}
+
+    main{margin-top:-20px; padding:0 16px 40px;}
+    .filter-bar{flex-direction:column; align-items:stretch;}
+    .filter-chips{overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px;}
+    .fchip{flex-shrink:0;}
+
+    .section-title{font-size:18px;}
+    .video-grid{grid-template-columns:1fr 1fr; gap:12px;}
+    .card-body{padding:10px 12px 12px;}
+    .card-body .title{font-size:12.5px; min-height:auto; -webkit-line-clamp:2; display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;}
+    .card-meta{font-size:10.5px;}
+    .card-tag{font-size:8.5px; padding:2px 6px;}
+
+    /* 開場動畫在手機縮小 */
+    .splash-tomato{width:120px; height:120px;}
+    .splash-word{font-size:28px; margin-top:18px;}
+    .splash-en{font-size:11px;}
+    .splash-btn{margin-top:28px; padding:12px 28px; font-size:14px;}
+
+    /* 播放頁在手機上堆疊 */
+    .player-topbar{padding:12px 16px;}
+    .back-link{font-size:12.5px;}
+    .player-main{padding:16px 16px 40px; grid-template-columns:1fr; gap:16px;}
+    .video-info h1{font-size:16px;}
+    .video-info p{font-size:12px;}
+    .mode-strip{width:100%; overflow-x:auto;}
+    .chip{flex-shrink:0; font-size:11px; padding:6px 12px;}
+    .subtitle-panel{max-height:none;}
+    .sline{padding:12px 16px;}
+    .sline .ko{font-size:14.5px;}
+    .sline .zh{font-size:12px;}
+  }
+
+  /* ============================================================
+     響應式設計：極小螢幕 (max-width: 380px)
+     ============================================================ */
+  @media (max-width:380px){
+    .video-grid{grid-template-columns:1fr;}
+    .hero h1{font-size:20px;}
+    .hero-stat{min-width:80px;}
+  }
 </style>
 </head>
 <body class="locked">
@@ -190,18 +288,24 @@ function enterApp(){
 </script>
 
 <div id="homePageContent">
+<div class="nav-overlay" id="navOverlay" onclick="closeMenu()"></div>
 <header>
   <div class="logo">
     <svg viewBox="0 0 200 200"><path d="M100 55 Q78 40 70 20 Q95 25 100 48 Q105 25 130 20 Q122 40 100 55" fill="#5a8a5f"/><path d="M100 55 C145 55 168 95 163 130 C158 168 133 185 100 185 C67 185 42 168 37 130 C32 95 55 55 100 55 Z" fill="#e1502f"/></svg>
     <span>蕃茄韓文</span>
   </div>
-  <nav>
-    <a class="active">影片學習</a>
-    <a>背單字</a>
-    <a>生詞本</a>
-    <a>學習進度</a>
+  <nav id="mainNav">
+    <a class="active" onclick="closeMenu()">影片學習</a>
+    <a onclick="closeMenu()">背單字</a>
+    <a onclick="closeMenu()">生詞本</a>
+    <a onclick="closeMenu()">學習進度</a>
   </nav>
-  <button class="signup-btn">登入 / 註冊</button>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <button class="signup-btn">登入 / 註冊</button>
+    <button class="menu-toggle" onclick="toggleMenu()" aria-label="選單">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </header>
 
 <div class="hero">
@@ -341,6 +445,14 @@ function goToHome(){
   document.getElementById('playerPage').classList.remove('active');
   document.getElementById('homePageContent').classList.remove('hidden');
   window.scrollTo(0,0);
+}
+function toggleMenu(){
+  document.getElementById('mainNav').classList.toggle('mobile-open');
+  document.getElementById('navOverlay').classList.toggle('show');
+}
+function closeMenu(){
+  document.getElementById('mainNav').classList.remove('mobile-open');
+  document.getElementById('navOverlay').classList.remove('show');
 }
 </script>
 
