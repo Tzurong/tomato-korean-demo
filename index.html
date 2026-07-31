@@ -102,9 +102,61 @@
 
   .coming-soon{opacity:0.55; cursor:default;}
   .coming-soon:hover{transform:none; box-shadow:none;}
+
+  /* ===== SPLASH ===== */
+  #splash{
+    position:fixed; inset:0; z-index:1000;
+    background:radial-gradient(circle at 50% 35%, #e1502f 0%, #a62e1f 75%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:opacity 0.6s ease;
+  }
+  #splash.fade-out{opacity:0; pointer-events:none;}
+  .splash-tomato{width:180px; height:180px; animation:tomatoIn 0.7s cubic-bezier(.34,1.56,.64,1) both, floatIdle 3s ease-in-out infinite 0.8s;}
+  @keyframes tomatoIn{0%{transform:scale(0.3) translateY(40px); opacity:0;} 100%{transform:scale(1) translateY(0); opacity:1;}}
+  @keyframes floatIdle{0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);}}
+  .splash-word{font-family:'Fraunces', serif; font-weight:700; font-size:40px; color:#fff; margin-top:26px; opacity:0; animation:wordIn 0.6s ease 0.5s forwards;}
+  .splash-en{font-size:14px; letter-spacing:0.35em; color:#ffd9cc; margin-top:8px; opacity:0; animation:wordIn 0.6s ease 0.7s forwards;}
+  @keyframes wordIn{0%{opacity:0; transform:translateY(12px);} 100%{opacity:1; transform:translateY(0);}}
+  .splash-btn{
+    margin-top:40px; background:#fff; color:var(--tomato-deep); border:none;
+    padding:14px 36px; border-radius:30px; font-size:15px; font-weight:700; cursor:pointer;
+    opacity:0; animation:wordIn 0.6s ease 1s forwards;
+    box-shadow:0 12px 28px -10px rgba(0,0,0,0.4);
+  }
+
+  body.locked{overflow:hidden;}
 </style>
 </head>
-<body>
+<body class="locked">
+
+<div id="splash" onclick="enterApp()">
+  <svg class="splash-tomato" viewBox="0 0 200 200">
+    <defs><radialGradient id="gs" cx="35%" cy="28%" r="75%"><stop offset="0%" stop-color="#ff8b65"/><stop offset="55%" stop-color="#d6402c"/><stop offset="100%" stop-color="#a62e1f"/></radialGradient></defs>
+    <ellipse cx="100" cy="178" rx="46" ry="8" fill="#000" opacity="0.15"/>
+    <path d="M100 55 Q78 40 70 20 Q95 25 100 48 Q105 25 130 20 Q122 40 100 55" fill="#5a8a5f"/>
+    <path d="M100 55 C145 55 168 95 163 130 C158 168 133 185 100 185 C67 185 42 168 37 130 C32 95 55 55 100 55 Z" fill="url(#gs)"/>
+    <ellipse cx="72" cy="90" rx="14" ry="20" fill="#fff" opacity="0.4" transform="rotate(-25 72 90)"/>
+    <ellipse cx="63" cy="128" rx="11" ry="7" fill="#ffafa0" opacity="0.65"/>
+    <ellipse cx="137" cy="128" rx="11" ry="7" fill="#ffafa0" opacity="0.65"/>
+    <circle cx="80" cy="112" r="7" fill="#2b2118"/><circle cx="120" cy="112" r="7" fill="#2b2118"/>
+    <circle cx="82.5" cy="109" r="2.3" fill="#fff"/><circle cx="122.5" cy="109" r="2.3" fill="#fff"/>
+    <path d="M88 138 Q100 150 112 138" stroke="#a62e1f" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  </svg>
+  <div class="splash-word">蕃茄韓文</div>
+  <div class="splash-en">TOMATO KOREAN</div>
+  <button class="splash-btn" onclick="enterApp()">開始學習 →</button>
+</div>
+
+<script>
+function enterApp(){
+  document.getElementById('splash').classList.add('fade-out');
+  document.body.classList.remove('locked');
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+  }, 650);
+}
+</script>
 
 <header>
   <div class="logo">
