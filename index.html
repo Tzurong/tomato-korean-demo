@@ -61,9 +61,10 @@
   .video-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr)); gap:20px; margin-bottom:50px;}
   .video-card{background:#fff; border-radius:16px; overflow:hidden; border:1px solid #f0e5d2; cursor:pointer; transition:transform 0.18s ease, box-shadow 0.18s ease;}
   .video-card:hover{transform:translateY(-4px); box-shadow:0 16px 32px -14px rgba(43,33,24,0.25);}
-  .card-thumb{aspect-ratio:16/9; position:relative; display:flex; align-items:flex-end; overflow:hidden;}
-  .card-thumb::before{content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.55) 100%);}
-  .card-thumb .play-btn{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.92); display:flex; align-items:center; justify-content:center; color:var(--tomato); font-size:16px; opacity:0; transition:opacity 0.18s ease;}
+  .card-thumb{aspect-ratio:16/9; position:relative; display:flex; align-items:flex-end; overflow:hidden; background:#000;}
+  .card-thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .card-thumb::before{content:''; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.55) 100%);}
+  .card-thumb .play-btn{position:absolute; z-index:2; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.92); display:flex; align-items:center; justify-content:center; color:var(--tomato); font-size:16px; opacity:0; transition:opacity 0.18s ease;}
   .video-card:hover .play-btn{opacity:1;}
   .card-duration{position:relative; z-index:2; margin:0 10px 8px auto; background:rgba(0,0,0,0.6); color:#fff; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:5px;}
   .card-badge{position:absolute; top:10px; left:10px; z-index:2; font-size:9.5px; font-weight:700; padding:3px 9px; border-radius:6px; background:#fff; color:var(--tomato-deep);}
@@ -100,43 +101,57 @@
   .mode-tab{flex-shrink:0; padding:13px 16px; font-size:13.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap;}
   .mode-tab.on{color:var(--tomato); border-bottom-color:var(--tomato);}
 
-  .player-scroll{flex:1; overflow-y:auto; background:var(--crate); padding:18px 16px 40px;}
-  .player-scroll-inner{max-width:640px; margin:0 auto;}
+  /* 字幕清單：滿版、無圓角、所有句子大小一致、可自由上下滑動 */
+  .player-scroll{flex:1; overflow-y:auto; background:#fff;}
 
-  .current-card{
-    background:#fff; border-radius:18px; padding:22px 20px; position:relative;
-    box-shadow:0 10px 26px -14px rgba(43,33,24,0.25); margin-bottom:22px;
+  .sub-row{
+    padding:18px 20px; border-bottom:1px solid #f0e5d2;
+    display:flex; align-items:flex-start; gap:14px; cursor:pointer;
   }
-  .current-card .ko{
-    font-family:'Noto Sans KR',sans-serif; font-size:21px; font-weight:700; color:var(--ink);
-    line-height:1.5; padding-right:36px;
+  .sub-row.active{background:#fbefe6;}
+  .sub-row-text{flex:1; min-width:0;}
+  .sub-row .ko{
+    font-family:'Noto Sans KR',sans-serif; font-size:17px; font-weight:600; color:var(--ink);
+    line-height:1.55;
   }
-  .current-card .zh{font-size:14.5px; color:var(--ink-soft); margin-top:12px; line-height:1.6; padding-right:36px;}
-  .icon-btn{
-    position:absolute; width:34px; height:34px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    background:#f5ede0; color:var(--ink-soft); font-size:15px; border:none;
+  .sub-row .zh{font-size:13.5px; color:var(--ink-soft); margin-top:6px; line-height:1.6;}
+  .heart-mini{
+    flex-shrink:0; background:none; border:none; cursor:pointer;
+    color:#d8cdb8; font-size:19px; padding:2px; line-height:1;
   }
-  .icon-btn.heart{top:18px; right:18px;}
-  .icon-btn.heart.on{background:#fbefe6; color:var(--tomato);}
-  .icon-btn.mic{bottom:18px; right:18px;}
-  .icon-btn.mic:active{background:var(--tomato); color:#fff;}
+  .heart-mini.on{color:var(--tomato);}
 
-  .upcoming-label{font-size:11.5px; font-weight:700; color:var(--ink-soft); margin:0 0 10px 4px; letter-spacing:0.05em;}
-  .upcoming-line{padding:10px 4px; color:var(--ink-soft); cursor:pointer;}
-  .upcoming-line .ko{font-family:'Noto Sans KR',sans-serif; font-size:14.5px; font-weight:500;}
-  .upcoming-line .zh{font-size:12px; margin-top:2px; opacity:0.85;}
-  .upcoming-line:hover{color:var(--ink);}
-
+  /* 底部固定控制列 */
   .player-controls{
     flex-shrink:0; background:#fff; border-top:1px solid #f0e5d2;
-    display:flex; align-items:center; justify-content:space-around; padding:10px 16px;
+    display:flex; align-items:center; justify-content:center; gap:36px; padding:14px 20px;
+    position:relative;
   }
-  .ctrl-btn{background:none; border:none; cursor:pointer; color:var(--ink-soft); font-size:19px; display:flex; align-items:center; justify-content:center; padding:8px;}
+  .ctrl-btn{
+    background:none; border:none; cursor:pointer; color:var(--ink); 
+    display:flex; align-items:center; justify-content:center; padding:6px;
+  }
+  .ctrl-btn svg{width:26px; height:26px;}
   .ctrl-btn.play-main{
-    width:52px; height:52px; border-radius:50%; background:var(--tomato); color:#fff; font-size:20px;
+    width:54px; height:54px; border-radius:50%; background:var(--tomato); color:#fff;
   }
+  .ctrl-btn.play-main svg{width:22px; height:22px;}
   .ctrl-btn:disabled{opacity:0.3; cursor:default;}
+
+  .speed-btn{
+    position:absolute; right:20px; top:50%; transform:translateY(-50%);
+    background:#f5ede0; border:none; border-radius:20px; padding:8px 14px;
+    font-size:13px; font-weight:700; color:var(--ink-soft); cursor:pointer;
+  }
+  .speed-menu{
+    display:none; position:absolute; bottom:56px; right:20px;
+    background:#fff; border-radius:12px; box-shadow:0 12px 30px -10px rgba(43,33,24,0.3);
+    border:1px solid #f0e5d2; overflow:hidden; z-index:10;
+  }
+  .speed-menu.show{display:block;}
+  .speed-option{padding:10px 22px; font-size:13.5px; font-weight:600; color:var(--ink-soft); cursor:pointer; white-space:nowrap;}
+  .speed-option:hover{background:#f5ede0;}
+  .speed-option.on{color:var(--tomato); font-weight:700;}
 
   @media (max-width:900px){
     header{padding:12px 20px;}
@@ -184,8 +199,8 @@
 
     #playerPage.active{position:fixed; inset:0; z-index:60; height:100dvh; background:var(--crate);}
     body.player-open{overflow:hidden; height:100%;}
-    .current-card .ko{font-size:18px;}
-    .current-card .zh{font-size:13.5px;}
+    .sub-row .ko{font-size:15.5px;}
+    .sub-row .zh{font-size:12.5px;}
   }
 
   @media (max-width:380px){
@@ -266,7 +281,8 @@
   <div class="section-title">🔥 立即可學</div>
   <div class="video-grid">
     <div class="video-card" onclick="goToPlayer()">
-      <div class="card-thumb" style="background:linear-gradient(135deg,#f6dcc5,#e8a93b);">
+      <div class="card-thumb">
+        <img src="https://img.youtube.com/vi/YVQVTHnw5L8/hqdefault.jpg" alt="한국어로 다양한 한국 문화에 대해 이야기하는 팟캐스트">
         <div class="card-badge">初級</div>
         <div class="play-btn">▶</div>
         <div class="card-duration" style="margin-left:auto;">21:03</div>
@@ -315,24 +331,27 @@
   </div>
 
   <div class="player-scroll">
-    <div class="player-scroll-inner">
-      <div class="current-card">
-        <button class="icon-btn heart" id="heartBtn" onclick="toggleHeart()">♡</button>
-        <div class="ko" id="currentKo">—</div>
-        <div class="zh" id="currentZh">—</div>
-        <button class="icon-btn mic" id="micBtn">🎤</button>
-      </div>
-
-      <div class="upcoming-label">接下來</div>
-      <div id="upcomingList"></div>
-    </div>
+    <div id="subList"></div>
   </div>
 
   <div class="player-controls">
-    <button class="ctrl-btn" onclick="prevLine()" id="prevBtn">⏮</button>
-    <button class="ctrl-btn play-main" onclick="togglePlay()" id="playBtn">▶</button>
-    <button class="ctrl-btn" onclick="nextLine()" id="nextBtn">⏭</button>
-    <button class="ctrl-btn" onclick="alert('播放速度設定，之後會加上 0.5x / 0.75x / 1x 選項')">⚙️</button>
+    <button class="ctrl-btn" onclick="prevLine()" id="prevBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+    </button>
+    <button class="ctrl-btn play-main" onclick="togglePlay()" id="playBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="ctrl-btn" onclick="nextLine()" id="nextBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+    </button>
+    <button class="speed-btn" id="speedBtn" onclick="toggleSpeedMenu()">1x</button>
+    <div class="speed-menu" id="speedMenu">
+      <div class="speed-option" data-speed="0.5">0.5x</div>
+      <div class="speed-option" data-speed="0.75">0.75x</div>
+      <div class="speed-option on" data-speed="1">1x</div>
+      <div class="speed-option" data-speed="1.25">1.25x</div>
+      <div class="speed-option" data-speed="1.5">1.5x</div>
+    </div>
   </div>
 </div>
 
@@ -347,8 +366,9 @@ const subtitles = [
 
 let ytPlayer = null;
 let trackingInterval = null;
-let currentIndex = 0;
+let currentIndex = -1;
 let heartedLines = new Set();
+let currentSpeed = 1;
 
 function enterApp(){
   document.getElementById('splash').classList.add('fade-out');
@@ -369,8 +389,8 @@ function goToPlayer(){
   document.getElementById('playerPage').classList.add('active');
   document.body.classList.add('player-open');
   requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0,0)));
-  currentIndex = 0;
-  renderCurrentCard();
+  buildSubtitleList();
+  setActiveLine(0, false);
 }
 function goToHome(){
   if(ytPlayer && ytPlayer.stopVideo){ ytPlayer.stopVideo(); }
@@ -378,50 +398,94 @@ function goToHome(){
   document.getElementById('playerPage').classList.remove('active');
   document.getElementById('homePageContent').classList.remove('hidden');
   document.body.classList.remove('player-open');
+  document.getElementById('speedMenu').classList.remove('show');
   window.scrollTo(0,0);
 }
 
-function renderCurrentCard(){
-  const s = subtitles[currentIndex];
-  document.getElementById('currentKo').textContent = s.korean;
-  document.getElementById('currentZh').textContent = s.chinese;
-  document.getElementById('heartBtn').textContent = heartedLines.has(currentIndex) ? '♥' : '♡';
-  document.getElementById('heartBtn').classList.toggle('on', heartedLines.has(currentIndex));
-  document.getElementById('prevBtn').disabled = currentIndex === 0;
-  document.getElementById('nextBtn').disabled = currentIndex === subtitles.length - 1;
-  renderUpcoming();
-}
-function renderUpcoming(){
-  const listEl = document.getElementById('upcomingList');
+/* ===== 建立完整字幕清單，全部同時存在，捲動時不會消失 ===== */
+function buildSubtitleList(){
+  const listEl = document.getElementById('subList');
   listEl.innerHTML = '';
-  for(let i = currentIndex + 1; i < subtitles.length; i++){
-    const s = subtitles[i];
-    const div = document.createElement('div');
-    div.className = 'upcoming-line';
-    div.innerHTML = `<div class="ko">${s.korean}</div><div class="zh">${s.chinese}</div>`;
-    div.onclick = () => { currentIndex = i; seekAndPlay(i); };
-    listEl.appendChild(div);
+  subtitles.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'sub-row';
+    row.dataset.index = i;
+    const isHearted = heartedLines.has(i);
+    row.innerHTML = `
+      <div class="sub-row-text">
+        <div class="ko">${s.korean}</div>
+        <div class="zh">${s.chinese}</div>
+      </div>
+      <button class="heart-mini${isHearted ? ' on' : ''}">${isHearted ? '♥' : '♡'}</button>
+    `;
+    row.querySelector('.sub-row-text').onclick = () => { setActiveLine(i, true); };
+    row.querySelector('.heart-mini').onclick = (e) => { e.stopPropagation(); toggleHeart(i); };
+    listEl.appendChild(row);
+  });
+}
+
+function setActiveLine(i, shouldSeek){
+  currentIndex = i;
+  document.querySelectorAll('.sub-row').forEach(r => r.classList.remove('active'));
+  const row = document.querySelector(`.sub-row[data-index="${i}"]`);
+  if(row){
+    row.classList.add('active');
   }
-}
-function toggleHeart(){
-  if(heartedLines.has(currentIndex)) heartedLines.delete(currentIndex);
-  else heartedLines.add(currentIndex);
-  renderCurrentCard();
-}
-function prevLine(){ if(currentIndex > 0){ currentIndex--; seekAndPlay(currentIndex); } }
-function nextLine(){ if(currentIndex < subtitles.length - 1){ currentIndex++; seekAndPlay(currentIndex); } }
-function seekAndPlay(i){
-  renderCurrentCard();
-  if(ytPlayer && ytPlayer.seekTo){
+  document.getElementById('prevBtn').disabled = i === 0;
+  document.getElementById('nextBtn').disabled = i === subtitles.length - 1;
+  if(shouldSeek && ytPlayer && ytPlayer.seekTo){
     ytPlayer.seekTo(subtitles[i].start, true);
     ytPlayer.playVideo();
   }
 }
+
+function scrollActiveIntoView(){
+  const scrollContainer = document.querySelector('.player-scroll');
+  const row = document.querySelector('.sub-row.active');
+  if(!scrollContainer || !row) return;
+  const targetTop = row.offsetTop - (scrollContainer.clientHeight / 2) + (row.clientHeight / 2);
+  scrollContainer.scrollTo({top: targetTop, behavior:'smooth'});
+}
+
+function toggleHeart(i){
+  if(heartedLines.has(i)) heartedLines.delete(i);
+  else heartedLines.add(i);
+  const row = document.querySelector(`.sub-row[data-index="${i}"] .heart-mini`);
+  if(row){
+    row.textContent = heartedLines.has(i) ? '♥' : '♡';
+    row.classList.toggle('on', heartedLines.has(i));
+  }
+}
+
+function prevLine(){ if(currentIndex > 0){ setActiveLine(currentIndex - 1, true); scrollActiveIntoView(); } }
+function nextLine(){ if(currentIndex < subtitles.length - 1){ setActiveLine(currentIndex + 1, true); scrollActiveIntoView(); } }
+
 function togglePlay(){
   if(!ytPlayer) return;
   const state = ytPlayer.getPlayerState();
   if(state === 1){ ytPlayer.pauseVideo(); } else { ytPlayer.playVideo(); }
 }
+
+function toggleSpeedMenu(){
+  document.getElementById('speedMenu').classList.toggle('show');
+}
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('speedMenu');
+  const btn = document.getElementById('speedBtn');
+  if(menu && !menu.contains(e.target) && e.target !== btn){
+    menu.classList.remove('show');
+  }
+});
+document.querySelectorAll('.speed-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    currentSpeed = parseFloat(opt.dataset.speed);
+    document.getElementById('speedBtn').textContent = currentSpeed + 'x';
+    document.querySelectorAll('.speed-option').forEach(o => o.classList.remove('on'));
+    opt.classList.add('on');
+    document.getElementById('speedMenu').classList.remove('show');
+    if(ytPlayer && ytPlayer.setPlaybackRate){ ytPlayer.setPlaybackRate(currentSpeed); }
+  });
+});
 
 const ytScript = document.createElement('script');
 ytScript.src = 'https://www.youtube.com/iframe_api';
@@ -435,13 +499,13 @@ window.onYouTubeIframeAPIReady = function(){
 };
 
 function onPlayerStateChange(event){
-  const playBtn = document.getElementById('playBtn');
+  const playIcon = document.getElementById('playIcon');
   if(event.data === YT.PlayerState.PLAYING){
-    playBtn.textContent = '❚❚';
+    playIcon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
     if(trackingInterval) clearInterval(trackingInterval);
     trackingInterval = setInterval(updateCurrentByTime, 400);
   } else {
-    playBtn.textContent = '▶';
+    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
     if(trackingInterval){ clearInterval(trackingInterval); trackingInterval = null; }
   }
 }
@@ -451,8 +515,8 @@ function updateCurrentByTime(){
   let idx = 0;
   for(let i=0;i<subtitles.length;i++){ if(t >= subtitles[i].start) idx = i; }
   if(idx !== currentIndex){
-    currentIndex = idx;
-    renderCurrentCard();
+    setActiveLine(idx, false);
+    scrollActiveIntoView();
   }
 }
 </script>
