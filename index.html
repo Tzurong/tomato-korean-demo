@@ -241,7 +241,7 @@
     .video-info p{font-size:12px;}
     .mode-strip{width:100%; overflow-x:auto;}
     .chip{flex-shrink:0; font-size:11px; padding:6px 12px;}
-    .subtitle-panel{max-height:none;}
+    .subtitle-panel{max-height:min(50vh, 420px);}
     .sline{padding:12px 16px;}
     .sline .ko{font-size:14.5px;}
     .sline .zh{font-size:12px;}
@@ -396,7 +396,7 @@ function enterApp(){
   <div class="player-main">
     <div>
       <div class="video-panel">
-        <iframe id="ytplayer" src="https://www.youtube-nocookie.com/embed/YVQVTHnw5L8?enablejsapi=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="ytplayer" src="https://www.youtube.com/embed/YVQVTHnw5L8?enablejsapi=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
       <div class="below-video">
         <div class="video-info">
@@ -425,16 +425,63 @@ const subtitles = [
 const subListEl = document.getElementById('subList');
 subtitles.forEach((s, i) => {
   const div = document.createElement('div');
-  div.className = 'sline' + (i === 0 ? ' active' : '');
+  div.className = 'sline';
+  div.dataset.index = i;
   div.innerHTML = `<div class="ko">${s.korean}</div><div class="zh">${s.chinese}</div>`;
   div.onclick = () => {
-    document.querySelectorAll('.sline').forEach(l => l.classList.remove('active'));
-    div.classList.add('active');
-    const iframe = document.getElementById('ytplayer');
-    iframe.contentWindow.postMessage(JSON.stringify({event:'command', func:'seekTo', args:[s.start, true]}), '*');
+    if(ytPlayer && ytPlayer.seekTo){
+      ytPlayer.seekTo(s.start, true);
+      ytPlayer.playVideo();
+    }
   };
   subListEl.appendChild(div);
 });
+
+/* ===== 載入 YouTube IFrame API，讓字幕能跟著播放進度自動捲動 ===== */
+let ytPlayer = null;
+let trackingInterval = null;
+let currentActiveIndex = -1;
+
+const ytScript = document.createElement('script');
+ytScript.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(ytScript);
+
+window.onYouTubeIframeAPIReady = function(){
+  ytPlayer = new YT.Player('ytplayer', {
+    events: {
+      onStateChange: onPlayerStateChange
+    }
+  });
+};
+
+function onPlayerStateChange(event){
+  if(event.data === YT.PlayerState.PLAYING){
+    if(trackingInterval) clearInterval(trackingInterval);
+    trackingInterval = setInterval(updateActiveSubtitle, 400);
+  } else {
+    if(trackingInterval) clearInterval(trackingInterval);
+  }
+}
+
+function updateActiveSubtitle(){
+  if(!ytPlayer || !ytPlayer.getCurrentTime) return;
+  const t = ytPlayer.getCurrentTime();
+  let idx = 0;
+  for(let i=0;i<subtitles.length;i++){
+    if(t >= subtitles[i].start) idx = i;
+  }
+  if(idx !== currentActiveIndex){
+    currentActiveIndex = idx;
+    const lines = document.querySelectorAll('.sline');
+    lines.forEach(l => l.classList.remove('active'));
+    const activeLine = lines[idx];
+    if(activeLine){
+      activeLine.classList.add('active');
+      // 讓目前這句自動捲動到面板可視範圍的中間位置
+      activeLine.scrollIntoView({block:'center', behavior:'smooth'});
+    }
+  }
+}
 
 function goToPlayer(){
   document.getElementById('homePageContent').classList.add('hidden');
